@@ -22,6 +22,22 @@ public sealed class ToggleableLightVisualsSystem : VisualizerSystem<ToggleableLi
         SubscribeLocalEvent<ToggleableLightVisualsComponent, GetEquipmentVisualsEvent>(OnGetEquipmentVisuals, after: new[] { typeof(ClientClothingSystem) });
     }
 
+    /// <summary>
+    ///     Copy all clothing specific visuals from another item.
+    /// </summary>
+    public void CopyVisuals(EntityUid uid, ToggleableLightVisualsComponent otherLights, ToggleableLightVisualsComponent? lights = null)
+    {
+        if (!Resolve(uid, ref lights))
+            return;
+
+        lights.InhandVisuals = otherLights.InhandVisuals;
+        lights.ClothingVisuals = otherLights.ClothingVisuals;
+        lights.SpriteLayer = otherLights.SpriteLayer;
+
+        _itemSys.VisualsChanged(uid);
+        Dirty(uid, lights);
+    }
+
     protected override void OnAppearanceChange(EntityUid uid, ToggleableLightVisualsComponent component, ref AppearanceChangeEvent args)
     {
         if (!AppearanceSystem.TryGetData<bool>(uid, ToggleableLightVisuals.Enabled, out var enabled, args.Component))

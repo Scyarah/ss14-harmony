@@ -1,8 +1,11 @@
 ﻿using System.Linq;
+using Content.Client.Light;
 using Content.Client.PDA;
+using Content.Client.Toggleable;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Clothing.EntitySystems;
 using Content.Shared.Inventory;
+using Content.Shared.Light.Components;
 using Robust.Client.GameObjects;
 using Robust.Shared.Prototypes;
 
@@ -13,6 +16,8 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
 {
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IComponentFactory _factory = default!;
+    [Dependency] private readonly ToggleableLightVisualsSystem _toggleableLightVisuals = default!;
+    [Dependency] private readonly HandheldLightSystem _handheldLightSystem = default!;
 
     private static readonly SlotFlags[] IgnoredSlots =
     {
@@ -42,6 +47,32 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
     private void HandleState(EntityUid uid, ChameleonClothingComponent component, ref AfterAutoHandleStateEvent args)
     {
         UpdateVisuals(uid, component);
+
+        if (string.IsNullOrEmpty(component.Default) ||
+            !_proto.TryIndex(component.Default, out EntityPrototype? proto))
+            return;
+
+
+        if (proto.TryGetComponent("ToggleableLightVisuals", out ToggleableLightVisualsComponent? toggleableLightVisuals))
+        {
+            EnsureComp<ToggleableLightVisualsComponent>(uid, out var current);
+            _toggleableLightVisuals.CopyVisuals(uid, toggleableLightVisuals, current);
+        }
+        else
+        {
+            RemComp<ToggleableLightVisualsComponent>(uid);
+        }
+
+
+        if (proto.TryGetComponent("HandheldLight", out HandheldLightComponent? handheldLight))
+        {
+            EnsureComp<HandheldLightComponent>(uid, out var current);
+            _handheldLightSystem.CopyVisuals(uid, handheldLight, current);
+        }
+        else
+        {
+            RemComp<ToggleableLightVisualsComponent>(uid);
+        }
     }
 
     protected override void UpdateSprite(EntityUid uid, EntityPrototype proto)

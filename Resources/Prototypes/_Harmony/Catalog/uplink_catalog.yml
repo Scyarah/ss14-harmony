@@ -67,6 +67,21 @@
     Telecrystal: 4
   categories:
   - UplinkWearables
+
+- type: listing
+  id: UplinkHardsuitChameleon
+  name: uplink-chameleon-hardsuit-name
+  description: uplink-chameleon-hardsuit-desc
+  icon: { sprite: /Textures/Clothing/OuterClothing/Suits/carpsuit.rsi, state: icon }
+  productEntity: ClothingOuterHardsuitChameleon
+  discountCategory: rareDiscounts
+  discountDownTo:
+    Telecrystal: 2
+  cost:
+    Telecrystal: 4
+  categories:
+  - UplinkWearables
+
 # Pointless
 - type: listing
   id: UplinkClusterWeh

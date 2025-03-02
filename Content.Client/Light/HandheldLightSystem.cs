@@ -21,6 +21,29 @@ public sealed class HandheldLightSystem : SharedHandheldLightSystem
         SubscribeLocalEvent<HandheldLightComponent, AppearanceChangeEvent>(OnAppearanceChange);
     }
 
+    /// <summary>
+    ///     Copy all clothing specific visuals from another item.
+    /// </summary>
+    public void CopyVisuals(EntityUid uid, HandheldLightComponent otherHandheldLight, HandheldLightComponent? handheldLight = null)
+    {
+        if (!Resolve(uid, ref handheldLight))
+            return;
+
+        handheldLight.Activated = otherHandheldLight.Activated;
+        handheldLight.AddPrefix = otherHandheldLight.AddPrefix;
+        handheldLight.Level = otherHandheldLight.Level;
+        handheldLight.SelfToggleActionEntity = otherHandheldLight.SelfToggleActionEntity;
+        handheldLight.ToggleAction = otherHandheldLight.ToggleAction;
+        handheldLight.ToggleActionEntity = otherHandheldLight.ToggleActionEntity;
+        handheldLight.ToggleOnInteract = otherHandheldLight.ToggleOnInteract;
+        handheldLight.TurnOffSound = otherHandheldLight.TurnOnSound;
+        handheldLight.TurnOffSound = otherHandheldLight.TurnOffSound;
+        handheldLight.TurnOnFailSound = otherHandheldLight.TurnOnFailSound;
+        handheldLight.Wattage = otherHandheldLight.Wattage;
+
+        Dirty(uid, handheldLight);
+    }
+
     /// <remarks>
     ///     TODO: Not properly predicted yet. Don't call this function if you want a the actual return value!
     /// </remarks>

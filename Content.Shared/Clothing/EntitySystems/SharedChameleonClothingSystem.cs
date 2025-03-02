@@ -1,9 +1,12 @@
+using System.Linq;
 using Content.Shared.Access.Components;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Contraband;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Item;
+using Content.Shared.Light;
+using Content.Shared.Light.Components;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
@@ -16,11 +19,14 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly ISerializationManager _serialization = default!;
     [Dependency] private readonly ClothingSystem _clothingSystem = default!;
+    [Dependency] private readonly ToggleableClothingSystem _toggleableClothingSystem = default!;
     [Dependency] private readonly ContrabandSystem _contraband = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly SharedItemSystem _itemSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedHandheldLightSystem _handheldLightSystem = default!;
+
 
     public override void Initialize()
     {
@@ -82,6 +88,15 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
             Dirty(uid, appearance);
         }
 
+        if (TryComp(uid, out ToggleableClothingComponent? toggleableClothing) && toggleableClothing?.ClothingUid != null &&
+            proto.TryGetComponent("ToggleableClothing", out ToggleableClothingComponent? toggleableClothingOther))
+        {
+            if (TryComp(toggleableClothing?.ClothingUid, out ChameleonClothingComponent? chamaleonClothingComponent))
+            {
+                UpdateVisuals((EntityUid)toggleableClothing!.ClothingUid!, chamaleonClothingComponent);
+            }
+        }
+
         // properly mark contraband
         if (proto.TryGetComponent("Contraband", out ContrabandComponent? contra))
         {
@@ -109,7 +124,8 @@ public abstract class SharedChameleonClothingSystem : EntitySystem
         if (!proto.TryGetComponent(out TagComponent? tag, _factory) || !_tag.HasTag(tag, "WhitelistChameleon"))
             return false;
 
-        if (requiredTag != null && !_tag.HasTag(tag, requiredTag))
+        Log.Info(string.Join("  ", requiredTag?.Split(";") ?? []));
+        if (requiredTag != null && requiredTag.Split(";").All(splitTag => !_tag.HasTag(tag, splitTag)))
             return false;
 
         // check if it's valid clothing
