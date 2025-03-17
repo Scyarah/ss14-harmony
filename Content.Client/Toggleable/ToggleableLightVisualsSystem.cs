@@ -72,7 +72,7 @@ public sealed class ToggleableLightVisualsSystem : VisualizerSystem<ToggleableLi
     /// <summary>
     ///     Add the unshaded light overlays to any clothing sprites.
     /// </summary>
-    private void OnGetEquipmentVisuals(EntityUid uid, ToggleableLightVisualsComponent component, GetEquipmentVisualsEvent args)
+    public void OnGetEquipmentVisuals(EntityUid uid, ToggleableLightVisualsComponent component, GetEquipmentVisualsEvent args)
     {
         if (!TryComp(uid, out AppearanceComponent? appearance)
             || !AppearanceSystem.TryGetData<bool>(uid, ToggleableLightVisuals.Enabled, out var enabled, appearance)
@@ -110,7 +110,7 @@ public sealed class ToggleableLightVisualsSystem : VisualizerSystem<ToggleableLi
         }
     }
 
-    private void OnGetHeldVisuals(EntityUid uid, ToggleableLightVisualsComponent component, GetInhandVisualsEvent args)
+    public void OnGetHeldVisuals(EntityUid uid, ToggleableLightVisualsComponent component, GetInhandVisualsEvent args)
     {
         if (!TryComp(uid, out AppearanceComponent? appearance)
             || !AppearanceSystem.TryGetData<bool>(uid, ToggleableLightVisuals.Enabled, out var enabled, appearance)

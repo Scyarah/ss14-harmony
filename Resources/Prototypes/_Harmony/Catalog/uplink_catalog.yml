@@ -72,7 +72,7 @@
   id: UplinkHardsuitChameleon
   name: uplink-chameleon-hardsuit-name
   description: uplink-chameleon-hardsuit-desc
-  icon: { sprite: /Textures/Clothing/OuterClothing/Suits/carpsuit.rsi, state: icon }
+  icon: { sprite: /Textures/Clothing/OuterClothing/Suits/rainbow.rsi, state: icon }
   productEntity: ClothingOuterHardsuitChameleon
   discountCategory: rareDiscounts
   discountDownTo:

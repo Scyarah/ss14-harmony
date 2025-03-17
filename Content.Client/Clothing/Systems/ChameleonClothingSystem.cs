@@ -1,9 +1,12 @@
 ﻿using System.Linq;
+using Content.Client.Items.Systems;
 using Content.Client.Light;
 using Content.Client.PDA;
 using Content.Client.Toggleable;
+using Content.Shared.Clothing;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Clothing.EntitySystems;
+using Content.Shared.Hands;
 using Content.Shared.Inventory;
 using Content.Shared.Light.Components;
 using Robust.Client.GameObjects;
@@ -18,6 +21,7 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
     [Dependency] private readonly IComponentFactory _factory = default!;
     [Dependency] private readonly ToggleableLightVisualsSystem _toggleableLightVisuals = default!;
     [Dependency] private readonly HandheldLightSystem _handheldLightSystem = default!;
+    [Dependency] private readonly ItemSystem _itemSystem = default!;
 
     private static readonly SlotFlags[] IgnoredSlots =
     {
@@ -36,6 +40,8 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
 
         PrepareAllVariants();
         SubscribeLocalEvent<PrototypesReloadedEventArgs>(OnProtoReloaded);
+        // SubscribeLocalEvent<ChameleonClothingComponent, GetInhandVisualsEvent>(_toggleableLightVisuals.OnGetHeldVisuals, after: new[] { typeof(ItemSystem) });
+        // SubscribeLocalEvent<ChameleonClothingComponent, GetEquipmentVisualsEvent>(_toggleableLightVisuals.OnGetEquipmentVisuals, after: new[] { typeof(ClientClothingSystem) });
     }
 
     private void OnProtoReloaded(PrototypesReloadedEventArgs args)
@@ -46,33 +52,28 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
 
     private void HandleState(EntityUid uid, ChameleonClothingComponent component, ref AfterAutoHandleStateEvent args)
     {
+        if (!string.IsNullOrEmpty(component.Default) &&
+            _proto.TryIndex(component.Default, out EntityPrototype? proto))
+        {
+            RemComp<HandheldLightComponent>(uid);
+            if (proto.TryGetComponent("HandheldLight", out HandheldLightComponent? handheldLight))
+            {
+                AddComp(uid, handheldLight);
+                _handheldLightSystem.UpdateVisuals(uid, handheldLight);
+                // EnsureComp<HandheldLightComponent>(uid, out var current);
+                // _handheldLightSystem.CopyVisuals(uid, handheldLight, current);
+            }
+
+            RemComp<ToggleableLightVisualsComponent>(uid);
+            if (proto.TryGetComponent("ToggleableLightVisuals", out ToggleableLightVisualsComponent? toggleableLightVisuals))
+            {
+                AddComp(uid, toggleableLightVisuals);
+                // EnsureComp<ToggleableLightVisualsComponent>(uid, out var current);
+                // _toggleableLightVisuals.CopyVisuals(uid, toggleableLightVisuals, current);
+            }
+        }
+
         UpdateVisuals(uid, component);
-
-        if (string.IsNullOrEmpty(component.Default) ||
-            !_proto.TryIndex(component.Default, out EntityPrototype? proto))
-            return;
-
-
-        if (proto.TryGetComponent("ToggleableLightVisuals", out ToggleableLightVisualsComponent? toggleableLightVisuals))
-        {
-            EnsureComp<ToggleableLightVisualsComponent>(uid, out var current);
-            _toggleableLightVisuals.CopyVisuals(uid, toggleableLightVisuals, current);
-        }
-        else
-        {
-            RemComp<ToggleableLightVisualsComponent>(uid);
-        }
-
-
-        if (proto.TryGetComponent("HandheldLight", out HandheldLightComponent? handheldLight))
-        {
-            EnsureComp<HandheldLightComponent>(uid, out var current);
-            _handheldLightSystem.CopyVisuals(uid, handheldLight, current);
-        }
-        else
-        {
-            RemComp<ToggleableLightVisualsComponent>(uid);
-        }
     }
 
     protected override void UpdateSprite(EntityUid uid, EntityPrototype proto)

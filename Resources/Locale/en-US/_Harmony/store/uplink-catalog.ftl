@@ -17,4 +17,4 @@ uplink-hyposhell-name = Box of hyposhells
 uplink-hyposhell-desc = A box containing four hyposhells, shotgun shells that can hold 7u of any chemical.
 
 uplink-chameleon-hardsuit-name = Chameleon Hardsuit
-uplink-chameleon-hardsuit-desc = Chameleon Hardsuit
+uplink-chameleon-hardsuit-desc = A space faring suit with chameleon technology! Carry on your mission in space in a variety of disguises.

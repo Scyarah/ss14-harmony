@@ -1,4 +1,5 @@
 using Content.Shared.Clothing.EntitySystems;
+using Content.Shared.Hands.Components;
 using Content.Shared.Inventory;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -38,6 +39,18 @@ public sealed partial class ChameleonClothingComponent : Component
     /// </summary>
     [DataField]
     public string? RequireTag;
+
+    /// <summary>
+    ///     Layers to add to the sprite of the player that is holding this entity (while the component is toggled on).
+    /// </summary>
+    [DataField("inhandVisuals")]
+    public Dictionary<HandLocation, List<PrototypeLayerData>> InhandVisuals = new();
+
+    /// <summary>
+    ///     Layers to add to the sprite of the player that is wearing this entity (while the component is toggled on).
+    /// </summary>
+    [DataField("clothingVisuals")]
+    public Dictionary<string, List<PrototypeLayerData>> ClothingVisuals = new();
 }
 
 [Serializable, NetSerializable]
